@@ -6,11 +6,27 @@ Production is red.
 ![four hosts, four palettes](screenshots/hosts.png)
 
 ```
-ssh prod       ->  crimson palette, red border
-ssh staging    ->  amber
-ssh dev        ->  green
+ssh prod       ->  crimson danger
+ssh staging    ->  soft red
+ssh dev        ->  ultraviolet
+ssh laptop     ->  vaporwave
 exit           ->  back to normal
 ```
+
+**All of it is yours to pick.** Nothing above is baked in: not the host names, not
+the palettes, not the colors. One row per host in `host-tints.conf` says which
+kitty theme to load and what the window border should be:
+
+```
+# <host>  <kitty-theme>  <active-border>  <inactive-border>
+prod      crimson-void   rgb(cc0000)      rgb(330000)
+staging   submarine      rgb(ffaa44)      rgb(400000)
+```
+
+The theme is any kitty color config you drop in `themes/`, eight ship with it,
+and the two border colors are the focused and unfocused states of the window.
+`bin/add-host <name> <theme>` scaffolds a new one. The only opinion the tool
+holds is the one in its name.
 
 For [kitty](https://sw.kovidgoyal.net/kitty/) + [fish](https://fishshell.com/) +
 [Hyprland](https://hypr.land/). Roughly 150 lines of fish.

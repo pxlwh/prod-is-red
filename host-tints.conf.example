@@ -18,7 +18,7 @@ prod       crimson-void  rgb(cc0000)  rgb(330000)
 staging    submarine     rgb(ffaa44)  rgb(400000)
 
 # Anything goes here.
-dev        ultraviolet   rgb(39ff14)  rgb(4a0080)
+dev        ultraviolet   rgb(a970ff)  rgb(4a0080)
 
 # A machine you own but is not this one.
 laptop     synthwave     rgb(a62d85)  rgb(2a0044)
