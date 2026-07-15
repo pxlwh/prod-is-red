@@ -6,8 +6,8 @@ Production is red.
 ![four hosts, four palettes](screenshots/hosts.png)
 
 ```
-ssh prod       ->  crimson danger
-ssh staging    ->  soft red
+ssh prod       ->  crimson void
+ssh staging    ->  submarine
 ssh dev        ->  ultraviolet
 ssh laptop     ->  synthwave
 exit           ->  back to normal
