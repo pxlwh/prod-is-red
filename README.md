@@ -9,7 +9,7 @@ Production is red.
 ssh prod       ->  crimson danger
 ssh staging    ->  soft red
 ssh dev        ->  ultraviolet
-ssh laptop     ->  vaporwave
+ssh laptop     ->  synthwave
 exit           ->  back to normal
 ```
 
