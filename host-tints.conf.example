@@ -1,0 +1,34 @@
+# Copy to ~/.config/hypr/host-tints.conf and edit.
+#
+# One row per host. Read by ssh.fish to pick the kitty palette. The border
+# colors are here as documentation and for bin/add-host to copy into your
+# windowrules.lua; Hyprland never reads this file.
+#
+#   <host>  <kitty-theme>  <active-border>  <inactive-border>
+#
+# <host> must match the name you actually type: `ssh prod` looks for "prod".
+# Colors accept any rgb()/rgba() form Hyprland understands.
+
+# Red means stop and think. This is the entire point of the tool: the box where
+# a careless command costs you a weekend does not look like the box where it
+# costs you nothing.
+prod       crimson-void  rgb(cc0000)  rgb(330000)
+
+# Amber: real, but recoverable.
+staging    submarine     rgb(ffaa44)  rgb(400000)
+
+# Anything goes here.
+dev        ultraviolet   rgb(39ff14)  rgb(4a0080)
+
+# A machine you own but is not this one.
+laptop     synthwave     rgb(a62d85)  rgb(2a0044)
+
+# Themes available out of the box (themes/*.conf):
+#   default        green on black (restored when you exit an ssh session)
+#   crimson-void   blood red on black
+#   submarine      amber on deep red
+#   ultraviolet    green on violet
+#   synthwave      orchid on purple
+#   aperture       orange on black
+#   bbs-night      gold on navy
+#   proxmox        Proxmox orange on black

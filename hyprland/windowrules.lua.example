@@ -1,0 +1,25 @@
+-- Paste into your ~/.config/hypr/windowrules.lua (Hyprland 0.55+ native Lua).
+--
+-- The local half of the tint. The remote announces itself in the terminal title
+-- ("prod:~"), and these rules match that prefix and paint the window border.
+--
+-- Why title matching, and not a per-window property: nothing has to track state.
+-- No setprop, no bookkeeping, no cleanup when a window dies or an ssh drops. The
+-- title IS the state, the remote owns it, and it is correct by construction:
+-- when you exit, the title reverts and so does the border. Deleting a row here
+-- is a complete, total revert for that host.
+
+local ssh_tints = {
+    { host = "prod",    colors = "rgb(cc0000) rgb(330000)" }, -- red: stop and think
+    { host = "staging", colors = "rgb(ffaa44) rgb(400000)" }, -- amber
+    { host = "dev",     colors = "rgb(39ff14) rgb(4a0080)" }, -- green
+    { host = "laptop",  colors = "rgb(a62d85) rgb(2a0044)" }, -- orchid
+}
+
+for _, t in ipairs(ssh_tints) do
+    hl.window_rule({
+        name         = "ssh-" .. t.host .. "-border",
+        match        = { title = "^(" .. t.host .. ":.*)$" },
+        border_color = t.colors,
+    })
+end

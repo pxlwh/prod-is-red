@@ -1,0 +1,60 @@
+#!/usr/bin/env fish
+# Scaffold a new host: a kitty palette, a tints row, and the Lua rule to paste.
+#
+#   bin/add-host <hostname> [theme-name]     theme defaults to <hostname>
+#
+# <hostname> must be the name you actually type at `ssh`, since that is what the
+# wrapper looks up and what the remote will put in the title.
+
+set -l host $argv[1]
+set -l theme $argv[2]
+test -z "$theme"; and set theme $host
+
+if test -z "$host"
+    echo "usage: add-host <hostname> [theme-name]" >&2
+    exit 1
+end
+
+set -l repo (realpath (status dirname)/..)
+set -l tints $HOME/.config/hypr/host-tints.conf
+
+# Placeholder colors: deliberately an ugly orange nobody would ship, so an
+# un-edited host is obvious rather than quietly wrong.
+set -l active 'rgb(ff9b3f)'
+set -l inactive 'rgb(7a5a2e)'
+
+# 1. kitty palette, starting from the default so it is a valid file immediately.
+set -l theme_file $repo/themes/$theme.conf
+if test -f $theme_file
+    echo "  [skip] $theme_file already exists"
+else
+    cp $repo/themes/default.conf $theme_file
+    sed -i "1c # $theme — TODO: pick colors. Copied from default." $theme_file
+    echo "  [new ]  $theme_file"
+end
+
+# 2. tints row, in ~/.config (your hosts do not belong in the repo).
+if not test -f $tints
+    echo "  [WARN]  $tints does not exist. Run install.fish first." >&2
+    exit 1
+end
+if grep -qE "^$host\s" $tints
+    echo "  [skip] $tints already has a '$host' row"
+else
+    printf '%-10s %-13s %s  %s\n' $host $theme $active $inactive >> $tints
+    echo "  [new ]  appended '$host' row to $tints"
+end
+
+# 3. The Lua rule. Printed rather than written: windowrules.lua is yours, and
+#    silently editing a live Hyprland config is a good way to break someone's
+#    desktop at 2am.
+echo
+echo "Add this to the ssh_tints table in ~/.config/hypr/windowrules.lua:"
+echo
+printf '    { host = "%s", colors = "%s %s" },\n' $host $active $inactive
+echo
+echo "Then:"
+echo "  1. edit $theme_file          (kitty palette)"
+echo "  2. pick real border colors    (both files above)"
+echo "  3. bin/deploy-remote $host    (fish remotes; bash: see README)"
+echo "  4. hyprctl reload"

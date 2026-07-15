@@ -1,0 +1,66 @@
+#!/usr/bin/env fish
+# Push the remote half to a host.
+#
+#   bin/deploy-remote <host>
+#
+# The remote half is one function: announce which box you are in the terminal
+# title. That is the whole contract. Everything else (palette, border) happens
+# locally off the back of that title.
+#
+# Requires fish on the remote. For a bash remote there is nothing to push; you
+# set the title from PS1 instead. See "bash remotes" in the README.
+
+set -l host $argv[1]
+if test -z "$host"
+    echo "usage: deploy-remote <host>" >&2
+    exit 1
+end
+
+set -l repo (realpath (status dirname)/..)
+set -l tmpl $repo/remote/_template/fish_title.fish
+
+if not test -f $tmpl
+    echo "missing template: $tmpl" >&2
+    exit 1
+end
+
+# Fail early with a useful message rather than a confusing scp error later.
+set -l remote_shell (ssh -o ConnectTimeout=8 $host 'echo $SHELL' 2>/dev/null | string trim)
+if test -z "$remote_shell"
+    echo "could not reach '$host' over ssh" >&2
+    exit 1
+end
+echo "  remote shell: $remote_shell"
+
+if not string match -q '*fish*' -- $remote_shell
+    echo "  [WARN]  '$host' does not use fish, so fish_title will never run."
+    echo "          Set the title from PS1 instead — see 'bash remotes' in the README."
+    exit 1
+end
+
+# Render the template for this host.
+set -l staged /tmp/fish_title.$host.fish
+string replace -a '__HOST__' $host < $tmpl > $staged
+
+ssh $host 'mkdir -p ~/.config/fish/functions'
+and scp -q $staged $host:~/.config/fish/functions/fish_title.fish
+and echo "  [ok ]  fish_title.fish → $host:~/.config/fish/functions/"
+or begin
+    echo "  [FAIL]  could not install fish_title.fish on $host" >&2
+    rm -f $staged
+    exit 1
+end
+rm -f $staged
+
+# OpenSSH does not forward COLORTERM, so fish sees a 16-color terminal and
+# quantizes every set_color hex down to the nearest palette slot: your carefully
+# picked host color silently becomes "whatever color2 happens to be". This
+# universal var is the backstop that survives a missing SendEnv/AcceptEnv pair.
+ssh $host 'fish -c "set -U fish_term24bit 1"' 2>/dev/null
+and echo "  [ok ]  fish_term24bit=1 (truecolor over ssh)"
+
+echo
+echo "Now add '$host' locally:"
+echo "  1. host-tints.conf  — a row:  $host <theme> <active-color> <inactive-color>"
+echo "  2. windowrules.lua  — an entry in the ssh_tints table"
+echo "  3. hyprctl reload"
